@@ -1,0 +1,32 @@
+name: Run Daily arXiv Scan
+
+on:
+  schedule:
+    - cron: '0 8 * * *' # Runs every day at 8:00 AM UTC (1:30 PM IST)
+  workflow_dispatch: # Allows manual trigger
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-level: '3.10'
+
+      - name: Install dependencies
+        run: |
+          pip install requests
+
+      - name: Run script
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          # Replace token placeholders inside script with env secrets
+          sed -i "s/YOUR_TELEGRAM_BOT_TOKEN/$TELEGRAM_BOT_TOKEN/g" arxiv_scout.py
+          sed -i "s/@my_arxiv_alerts/$TELEGRAM_CHAT_ID/g" arxiv_scout.py
+          python arxiv_scout.py
