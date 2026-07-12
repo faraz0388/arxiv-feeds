@@ -4,13 +4,27 @@ import urllib.parse
 import datetime
 import requests
 
-# 1. Define your keywords (use AND, OR, and parentheses)
-KEYWORDS = '("cavity QED" AND "qudit") OR ("cold atoms" AND "imaging") OR ("multidimensional" AND "quantum computing")'
+# 1. Your updated research keywords (Exact phrase matching via double quotes)
+KEYWORDS = (
+    '("cold atom") OR '
+    '("ultracold atoms") OR '
+    '("ultracold molecules") OR '
+    '("cavity QED") OR '
+    '("cavity thermodynamics") OR '
+    '("Rb K dual species MOT") OR '
+    '("K2 molecules") OR '
+    '("Rb2 molecules") OR '
+    '("Dual species trap") OR '
+    '("KRb molecule") OR '
+    '("lasing through cavity") OR '
+    '("cavity g2 measurement")'
+)
+
 # Encode query for URL
 query = urllib.parse.quote(KEYWORDS)
 
-# 2. Query arXiv API for papers submitted yesterday/today
-url = f'http://export.arxiv.org/api/query?search_query=all:{query}&sortBy=submittedDate&sortOrder=descending&max_results=10'
+# 2. Query arXiv API for papers sorted by submission date
+url = f'http://export.arxiv.org/api/query?search_query=all:{query}&sortBy=submittedDate&sortOrder=descending&max_results=15'
 
 # Fetch data
 response = urllib.request.urlopen(url)
@@ -28,7 +42,7 @@ new_papers = []
 
 for entry in root.findall('atom:entry', namespaces):
     published = entry.find('atom:published', namespaces).text[:10]
-    # Keep only papers published in the last 48 hours
+    # Filter for papers published in the last 48 hours
     if published >= yesterday:
         title = entry.find('atom:title', namespaces).text.strip().replace('\n', ' ')
         link = entry.find('atom:id', namespaces).text
@@ -37,10 +51,10 @@ for entry in root.findall('atom:entry', namespaces):
 
 # 3. Send alerts to Telegram if new papers found
 if new_papers:
-    bot_token = "YOUR_TELEGRAM_BOT_TOKEN" # We will set this securely
-    chat_id = "@my_arxiv_alerts" # Your channel name
+    bot_token = "YOUR_TELEGRAM_BOT_TOKEN"
+    chat_id = "@my_arxiv_alerts"
     
-    header = f"🚨 *New arXiv papers found for your research keywords:* \n\n"
+    header = f"🚨 *New arXiv papers found for your research:* \n\n"
     full_message = header + "\n---\n".join(new_papers)
     
     # Send message in chunks of 4000 characters if too long
