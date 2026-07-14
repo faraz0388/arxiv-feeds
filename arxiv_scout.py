@@ -7,6 +7,7 @@ import requests
 # 1. Your updated research keywords (Exact phrase matching via double quotes)
 KEYWORDS = (
     '("cold atom") OR '
+    '("Rydberg atom") OR '
     '("ultracold atoms") OR '
     '("ultracold molecules") OR '
     '("cavity QED") OR '
